@@ -21,18 +21,52 @@ public class Cube {
 	};
 
 	// orientation
-	private int axis; // xyz
+	private int axis = X_AXIS; // xyz
 	private boolean polarity; // 1 or 0
 	private int rotation; // 0-3
 
 	// initial position
-	int[] initExposedAxis = new int[3];
-	boolean[] initExposedPolarity = new boolean[3];
+	private int[] initExposedAxis = new int[3];
+	private boolean[] initExposedPolarity = new boolean[3];
 
 	// current position
-	int[] exposedAxis = new int[3];
-	boolean[] exposedPolarity = new boolean[3];
+	private final int[] exposedAxis = new int[3];
+	private final boolean[] exposedPolarity = new boolean[3];
 
+	public Cube(int exposedAxis0, int exposedAxis1, int exposedAxis2,
+			boolean exposedPolarity0, boolean exposedPolarity1,
+			boolean exposedPolarity2) {
+		
+		initExposedAxis[0] = exposedAxis0;
+		initExposedAxis[1] = exposedAxis1;
+		initExposedAxis[2] = exposedAxis2;
+		initExposedPolarity[0] = exposedPolarity0;
+		initExposedPolarity[1] = exposedPolarity1;
+		initExposedPolarity[2] = exposedPolarity2;
+
+		setAxis(X_AXIS);
+		setPolarity(true);
+		setRotation(0);
+		setExposedAxes(initExposedAxis, initExposedPolarity);
+	}
+
+	/**
+	 * Copy constructor
+	 * 
+	 * @param other
+	 */
+	public Cube(Cube other) {
+		this.initExposedAxis = other.initExposedAxis;
+		this.initExposedPolarity = other.initExposedPolarity;
+		
+		setAxis(other.axis);
+		setPolarity(other.polarity);
+		setRotation(other.rotation);
+		
+		setExposedAxes(other.exposedAxis, other.exposedPolarity);
+	}
+
+	
 	/**
 	 * @return true if cube is in original position, false otw
 	 */
@@ -100,22 +134,6 @@ public class Cube {
 		return true;
 	}
 
-	public Cube(int exposedAxis0, int exposedAxis1, int exposedAxis2,
-			boolean exposedPolarity0, boolean exposedPolarity1,
-			boolean exposedPolarity2) {
-
-		initExposedAxis[0] = exposedAxis0;
-		initExposedAxis[1] = exposedAxis1;
-		initExposedAxis[2] = exposedAxis2;
-		initExposedPolarity[0] = exposedPolarity0;
-		initExposedPolarity[1] = exposedPolarity1;
-		initExposedPolarity[2] = exposedPolarity2;
-
-		setAxis(X_AXIS);
-		setPolarity(true);
-		setRotation(0);
-		setExposedAxes(initExposedAxis, initExposedPolarity);
-	}
 
 	public void setAxis(int a) {
 		if (a != X_AXIS && a != Y_AXIS && a != Z_AXIS) {

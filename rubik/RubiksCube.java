@@ -10,6 +10,8 @@ public class RubiksCube {
     private static int homeCubeCount;
     
     private Vector<Cube> cubeVector = new Vector<Cube>();
+	private Vector<Cube> newCubeVector;
+
     private Random rand = new Random();
     int i;
     int count;
@@ -75,20 +77,47 @@ public class RubiksCube {
 
 	private void tryRotation(Vector<Cube> cubeVector, int axis, boolean polarity,
 			boolean clockwise, int rescursionCount) throws Exception {
+		
+		if (--rescursionCount == 0) {
+			rotate(cubeVector, axis, polarity, clockwise ? false : true);
+			return;
+		}
+		
 		int count = rotate(cubeVector, axis, polarity, clockwise);
-		rotate(cubeVector, axis, polarity, clockwise ? false : true);
+		
+		Vector<Cube> tempCubeVector = copyCubeVector(cubeVector);
+		
 		if (count > maxHomeCubeCount) {
 			maxHomeCubeCount = count;
-			bestAxis = axis;
-			bestPolarity = polarity;
-			bestClockwise = clockwise;
+//			bestAxis = axis;
+//			bestPolarity = polarity;
+//			bestClockwise = clockwise;
+			
+			this.newCubeVector = tempCubeVector;
+			
 		}
+
 		System.out.println("rescursionCount = " + rescursionCount);
-		rescursionCount--;
-		if (rescursionCount > 0) {
-			tryRotation(cubeVector,  axis,  polarity,
-			 clockwise,  rescursionCount);
+		for (axis = 0; axis < 3; axis++) {
+			tryRotation(cubeVector, axis, false, false, rescursionCount);
+			tryRotation(cubeVector, axis, false, true, rescursionCount);
+			tryRotation(cubeVector, axis, true, false, rescursionCount);
+			tryRotation(cubeVector, axis, true, true, rescursionCount);
 		}
+
+
+	}
+	
+	private Vector<Cube> copyCubeVector(Vector<Cube> cubeVector) {
+		
+		Vector<Cube> retVal = new Vector<Cube>();
+		Iterator<Cube> iterator = cubeVector.iterator();
+		while (iterator.hasNext()) {
+			Cube cube = iterator.next();
+			Cube cubeCopy = new Cube(cube);
+			retVal.add(cubeCopy);
+		}
+		return retVal;
 	}
 
 	private int rotate(Vector<Cube> cubeVector, int axis, boolean polarity,
@@ -134,13 +163,20 @@ public class RubiksCube {
 	private void solve() throws Exception {
 		System.out.println("trying all rotations...");
 		for (axis = 0; axis < 3; axis++) {
-			tryRotation(cubeVector, axis, false, false, 1);
-			tryRotation(cubeVector, axis, false, true, 1);
-			tryRotation(cubeVector, axis, true, false, 1);
-			tryRotation(cubeVector, axis, true, true, 1);
+			tryRotation(cubeVector, axis, false, false, 4);
+			tryRotation(cubeVector, axis, false, true, 4);
+			tryRotation(cubeVector, axis, true, false, 4);
+			tryRotation(cubeVector, axis, true, true, 4);
 		}
+		System.out.println("calling analyze 1");
+
 		analyze(cubeVector);
-		rotate(cubeVector, this.bestAxis, this.bestPolarity, this.bestClockwise);
+//		rotate(cubeVector, this.bestAxis, this.bestPolarity, this.bestClockwise);
+		this.cubeVector = this.newCubeVector;
+		System.out.println("calling analyze 2");
+
+		analyze(cubeVector);
+
 
 		if (maxHomeCubeCount <= homeCubeCount) {
 			Thread.sleep(3000L);
@@ -160,6 +196,7 @@ public class RubiksCube {
 			}
 	} catch (Exception e) {
 	    System.out.println("Exception " + e);
+	    e.printStackTrace();
 	}
     }
 
