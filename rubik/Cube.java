@@ -70,7 +70,7 @@ public class Cube {
 	/**
 	 * @return true if cube is in original position, false otw
 	 */
-	public boolean isHome() throws Exception {
+	public boolean isHome() {
 
 		int i, j;
 		int matchCount;
@@ -95,7 +95,8 @@ public class Cube {
 			}
 		}
 		if (matchCount > 3) {
-			throw new Exception();
+			System.out.println("matchCount = " + matchCount);
+			return false;
 		}
 		if (matchCount == 3) {
 

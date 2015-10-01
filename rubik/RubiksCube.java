@@ -78,32 +78,43 @@ public class RubiksCube {
 	private void tryRotation(Vector<Cube> cubeVector, int axis, boolean polarity,
 			boolean clockwise, int rescursionCount) throws Exception {
 		
-		if (--rescursionCount == 0) {
-			rotate(cubeVector, axis, polarity, clockwise ? false : true);
-			return;
-		}
+//		if (--rescursionCount == 0) {
+//			rotate(cubeVector, axis, polarity, clockwise ? false : true);
+//			return;
+//		}
 		
+		//analyze(this.cubeVector);
+
 		int count = rotate(cubeVector, axis, polarity, clockwise);
 		
-		Vector<Cube> tempCubeVector = copyCubeVector(cubeVector);
-		
+		System.out.println("count before  = " + count + ", maxHomeCubeCount = " + maxHomeCubeCount);
+
 		if (count > maxHomeCubeCount) {
 			maxHomeCubeCount = count;
 //			bestAxis = axis;
 //			bestPolarity = polarity;
 //			bestClockwise = clockwise;
 			
-			this.newCubeVector = tempCubeVector;
-			
+			this.newCubeVector = copyCubeVector(cubeVector);
+//			analyze(tempCubeVector);
 		}
+		
+		System.out.println("cubeVector     home cube count = " + this.getHomeCubeCount(cubeVector));
+		System.out.println("newCubeVector  home cube count = " + this.getHomeCubeCount(newCubeVector));
 
-		System.out.println("rescursionCount = " + rescursionCount);
-		for (axis = 0; axis < 3; axis++) {
-			tryRotation(cubeVector, axis, false, false, rescursionCount);
-			tryRotation(cubeVector, axis, false, true, rescursionCount);
-			tryRotation(cubeVector, axis, true, false, rescursionCount);
-			tryRotation(cubeVector, axis, true, true, rescursionCount);
-		}
+		count = rotate(cubeVector, axis, polarity, !clockwise);
+		System.out.println("count after   = " + count + ", maxHomeCubeCount = " + maxHomeCubeCount);
+
+		
+//		System.out.println("rescursionCount = " + rescursionCount);
+//		for (axis = 0; axis < 3; axis++) {
+//			tryRotation(cubeVector, axis, false, false, rescursionCount);
+//			tryRotation(cubeVector, axis, false, true, rescursionCount);
+//			tryRotation(cubeVector, axis, true, false, rescursionCount);
+//			tryRotation(cubeVector, axis, true, true, rescursionCount);
+//		}
+//		this.cubeVector = this.newCubeVector;
+//		analyze(cubeVector);
 
 
 	}
@@ -120,6 +131,20 @@ public class RubiksCube {
 		return retVal;
 	}
 
+	int getHomeCubeCount(Vector<Cube> cubeVector) {
+		int homeCubeCount = 0;
+		Iterator<Cube> it = cubeVector.iterator();
+
+		while (it.hasNext()) {
+			Cube c = (Cube) it.next();
+			if (c.isHome()) {
+				homeCubeCount++;
+			}
+		}
+		System.out.println("home cube count = " + homeCubeCount);
+		return homeCubeCount;
+	}
+	
 	private int rotate(Vector<Cube> cubeVector, int axis, boolean polarity,
 			boolean clockwise) throws Exception {
 		Iterator<Cube> it = cubeVector.iterator();
@@ -156,6 +181,8 @@ public class RubiksCube {
 		System.out.println("maxHomeCubeCount = " + maxHomeCubeCount);
 		if (homeCubeCount == 26) {
 			System.out.println("SOLVED!!");
+		} else if (homeCubeCount > maxHomeCubeCount) {
+			maxHomeCubeCount = homeCubeCount;
 		}
 		return solved;
 	}
@@ -163,43 +190,31 @@ public class RubiksCube {
 	private void solve() throws Exception {
 		System.out.println("trying all rotations...");
 		for (axis = 0; axis < 3; axis++) {
+			
 			tryRotation(cubeVector, axis, false, false, 4);
 			tryRotation(cubeVector, axis, false, true, 4);
 			tryRotation(cubeVector, axis, true, false, 4);
 			tryRotation(cubeVector, axis, true, true, 4);
 		}
-		System.out.println("calling analyze 1");
 
-		analyze(cubeVector);
 //		rotate(cubeVector, this.bestAxis, this.bestPolarity, this.bestClockwise);
-		this.cubeVector = this.newCubeVector;
-		System.out.println("calling analyze 2");
 
-		analyze(cubeVector);
-
-
-		if (maxHomeCubeCount <= homeCubeCount) {
-			Thread.sleep(3000L);
-			System.out.println("recursing");
-			solve();
-		}
 	}
 
-    public static void main(String args[]) throws Exception {
-	RubiksCube rc = new RubiksCube();
-	maxHomeCubeCount = 0;
+	public static void main(String args[]) throws Exception {
+		RubiksCube rc = new RubiksCube();
+		maxHomeCubeCount = 0;
 
-	try {
+		try {
 			while (true) {
 				rc.solve();
 				Thread.sleep(3000L);
 			}
-	} catch (Exception e) {
-	    System.out.println("Exception " + e);
-	    e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("Exception " + e);
+			e.printStackTrace();
+		}
 	}
-    }
-
 
 }
 
